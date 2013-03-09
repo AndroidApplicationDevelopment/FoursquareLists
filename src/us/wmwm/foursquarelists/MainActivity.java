@@ -1,15 +1,30 @@
 package us.wmwm.foursquarelists;
 
+import us.wmwm.foursquarelists.fragments.LoginFragment;
 import android.os.Bundle;
-import android.app.Activity;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
+	FoursquareApi api = new FoursquareApi();
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		if(!api.isLoggedIn(this)) {
+			showLogin();
+		}
+	}
+
+	private void showLogin() {
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		LoginFragment lf = new LoginFragment();
+		ft.replace(R.id.fragment_content, lf,ft.getClass().getName());
+		ft.commit();
 	}
 
 	@Override
