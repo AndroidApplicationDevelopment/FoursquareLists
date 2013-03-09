@@ -13,12 +13,14 @@ public class MainActivity extends FragmentActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
+		api = new FoursquareApi(this);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
 		if(!api.isLoggedIn(this)) {
 			showLogin();
+		} else {
+			showLists();
 		}
 	}
 
@@ -27,6 +29,14 @@ public class MainActivity extends FragmentActivity {
 		LoginFragment lf = new LoginFragment();
 		lf.setFoursquareApi(api);
 		lf.setOnUserLogin(onUserLoginListener);
+		ft.replace(R.id.fragment_content, lf,ft.getClass().getName());
+		ft.commit();
+	}
+	
+	private void showLists() {
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		MyListsFragment lf = new MyListsFragment();
+		lf.setFoursquareApi(api);
 		ft.replace(R.id.fragment_content, lf,ft.getClass().getName());
 		ft.commit();
 	}
@@ -42,6 +52,7 @@ public class MainActivity extends FragmentActivity {
 		@Override
 		public void onLogin(String token) {
 			api.save(token);
+			showLists();
 		}
 	};
 

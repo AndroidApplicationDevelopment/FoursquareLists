@@ -39,9 +39,8 @@ public class FoursquareApi {
 	}
 	
 	public FoursquareList getLists() throws Exception {
-		URL u = new URL("https://api.foursquare.com/v2/users/self/lists");
+		URL u = new URL("https://api.foursquare.com/v2/users/self/lists?oauth_token="+prefs.getString("token", null));
 		HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-		conn.setRequestProperty("Authorization", prefs.getString("token", null));
 		int code = conn.getResponseCode();
 		StringBuilder b = new StringBuilder();
 		InputStreamReader r = new InputStreamReader(conn.getInputStream());
