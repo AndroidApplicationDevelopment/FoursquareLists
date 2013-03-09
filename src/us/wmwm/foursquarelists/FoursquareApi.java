@@ -1,5 +1,7 @@
 package us.wmwm.foursquarelists;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import oauth.signpost.OAuthConsumer;
@@ -12,21 +14,29 @@ public class FoursquareApi {
 
 	private static final String CLIENT_ID="MUSHT2OIZ1RD5Y2EECLK3PSY4Z3L3VEJGJFN2KBN5FTX1XFG";
 	
-	private static final String CLIENT_SECRET="YFA4VVV4A05POOIVOXNFR5TCNN2ONQ5YJKCBBUAXCEIWEA4M";
-	
 	OAuthConsumer consumer;
 	
 	OAuthProvider provider;
 	
-	public FoursquareApi() {
-		// TODO Auto-generated constructor stub
-		//consumer = new DefaultOAuthConsumer(CLIENT_ID, CLIENT_SECRET);
-		//provider = new DefaultOAuthProvider(null, accessTokenEndpointUrl, authorizationWebsiteUrl)
+	SharedPreferences prefs;
+	
+	public FoursquareApi(Context ctx) {
+		prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+	}
+	
+	public void save(String token) {
+		prefs.edit().putString("token", token).commit();
 	}
 	
 	public boolean isLoggedIn(Context ctx) {
 		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(ctx);
-		return p.getString("userID", null)!=null;		
+		return p.getString("token", null)!=null;		
+	}
+	
+	public FoursquareList getLists() throws Exception {
+		URL u = new URL("https://api.foursquare.com/v2/users/self/lists");
+		HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+		conn.setRequestProperty("Authorization", newValue);
 	}
 	
 	public String getRequestUrl() {
