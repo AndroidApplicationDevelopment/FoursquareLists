@@ -1,6 +1,7 @@
 package us.wmwm.foursquarelists;
 
 import us.wmwm.foursquarelists.fragments.LoginFragment;
+import us.wmwm.foursquarelists.fragments.LoginFragment.OnUserLoginListener;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -23,6 +24,8 @@ public class MainActivity extends FragmentActivity {
 	private void showLogin() {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		LoginFragment lf = new LoginFragment();
+		lf.setFoursquareApi(api);
+		lf.setOnUserLogin(onUserLoginListener);
 		ft.replace(R.id.fragment_content, lf,ft.getClass().getName());
 		ft.commit();
 	}
@@ -33,5 +36,12 @@ public class MainActivity extends FragmentActivity {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
+	
+	private OnUserLoginListener onUserLoginListener = new OnUserLoginListener() {
+		@Override
+		public void onLogin(String token) {
+			finish();
+		}
+	};
 
 }

@@ -1,40 +1,37 @@
 package us.wmwm.foursquarelists.fragments;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 import us.wmwm.foursquarelists.FoursquareApi;
 import us.wmwm.foursquarelists.R;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class LoginFragment extends Fragment {
 
 	WebView webView;
-	
-	ScheduledExecutorService executor;
-	
-	String tokenUrl;
-	String tokenSecret;
-	String verifier;
+		
+	String accessToken;
 	
 	FoursquareApi foursquareApi;
 	
-	public void setFoursquareApi(FoursquareApi foursquareApi) {
-		this.foursquareApi = foursquareApi;
+	public static interface OnUserLoginListener {
+		void onLogin(String token);
 	}
 	
+	OnUserLoginListener onUserLogin;
 	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-		
-		executor = Executors.newScheduledThreadPool(1);
+	public void setOnUserLogin(OnUserLoginListener onUserLogin) {
+		this.onUserLogin = onUserLogin;
+	}
+	
+	public void setFoursquareApi(FoursquareApi foursquareApi) {
+		this.foursquareApi = foursquareApi;
 	}
 	
 	@Override
@@ -42,6 +39,28 @@ public class LoginFragment extends Fragment {
 			Bundle savedInstanceState) {		
 		View root = inflater.inflate(R.layout.fragment_login, container,false);
 		webView = (WebView) root.findViewById(R.id.webview);
+		webView.getSettings().setJavaScriptEnabled(true);
+		webView.setWebChromeClient(new WebChromeClient() {
+			
+		});
+		webView.setWebViewClient(new WebViewClient() {
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				// TODO Auto-generated method stub
+				System.out.println(url);
+				Uri uri = Uri.parse(url);
+				String fragment = uri.getFragment();
+				if(fragment!=null && fragment.contains("access_token=")) {
+					String token = fragment.split("=")[1];
+					accessToken = token;
+					if(onUserLogin!=null) {
+						onUserLogin.onLogin(token);
+					}
+					return true;
+				}
+				return super.shouldOverrideUrlLoading(view, url);
+			}
+		});
 		return root;
 	}
 	
@@ -49,7 +68,10 @@ public class LoginFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-		webView.loadUrl("http://google.com");
+		
+		String url = foursquareApi.getRequestUrl();
+		System.out.println(url);
+		webView.loadUrl(url);
 	}
-	
+
 }
