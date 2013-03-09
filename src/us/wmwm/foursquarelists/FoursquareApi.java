@@ -38,8 +38,24 @@ public class FoursquareApi {
 		return p.getString("token", null)!=null;		
 	}
 	
-	public FoursquareList getLists() throws Exception {
+	public FoursquareLists getLists() throws Exception {
 		URL u = new URL("https://api.foursquare.com/v2/users/self/lists?oauth_token="+prefs.getString("token", null));
+		HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+		int code = conn.getResponseCode();
+		StringBuilder b = new StringBuilder();
+		InputStreamReader r = new InputStreamReader(conn.getInputStream());
+		BufferedReader br = new BufferedReader(r);
+		String line = null;
+		while((line = br.readLine())!=null) {
+			b.append(line).append("\n");
+		}
+		System.out.println(b);
+		JSONObject obj = new JSONObject(b.toString());
+		return new FoursquareLists(obj);
+	}
+	
+	public FoursquareList getList(String id) throws Exception {
+		URL u = new URL("https://api.foursquare.com/v2/lists/" + id + "?oauth_token="+prefs.getString("token", null));
 		HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 		int code = conn.getResponseCode();
 		StringBuilder b = new StringBuilder();
@@ -53,6 +69,7 @@ public class FoursquareApi {
 		JSONObject obj = new JSONObject(b.toString());
 		return new FoursquareList(obj);
 	}
+	
 	
 	public String getRequestUrl() {
 		try {

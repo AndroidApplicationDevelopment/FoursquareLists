@@ -30,8 +30,11 @@ public class MyListsFragment extends Fragment {
 	Runnable loadLists = new Runnable() {
 		public void run() {
 			try {
-				FoursquareList l = foursquareApi.getLists();
-				
+				FoursquareLists l = foursquareApi.getLists();
+				for(int i = 0; i < l.getIds().size(); i++) {
+					FoursquareList list = foursquareApi.getList(l.getIds().get(i));
+					System.out.println(list);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
