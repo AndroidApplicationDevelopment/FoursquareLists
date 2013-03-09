@@ -17,6 +17,8 @@ public class MyListsFragment extends Fragment {
 	
 	FoursquareApi foursquareApi;
 	
+	VenueAdapter adapter;
+	
 	public void setFoursquareApi(FoursquareApi foursquareApi) {
 		this.foursquareApi = foursquareApi;
 	}
@@ -37,7 +39,11 @@ public class MyListsFragment extends Fragment {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							MyListsFragment.this.list.setAdapter(new VenueAdapter(list));
+							if(adapter==null) {
+								MyListsFragment.this.list.setAdapter(adapter = new VenueAdapter(list));
+							} else {
+								adapter.append(list);
+							}
 						}
 					});
 				}

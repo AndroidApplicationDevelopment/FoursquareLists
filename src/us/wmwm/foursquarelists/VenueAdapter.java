@@ -46,4 +46,8 @@ public class VenueAdapter extends BaseAdapter {
 		return convertView;
 	}
 
+	public void append(FoursquareList list2) {
+		list.venues.addAll(list2.getVenues());
+	}
+
 }
