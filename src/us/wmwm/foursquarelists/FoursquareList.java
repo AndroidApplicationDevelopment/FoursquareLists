@@ -12,11 +12,10 @@ public class FoursquareList {
 	
 	public FoursquareList(JSONObject obj) {
 		JSONObject resp = obj.optJSONObject("response");
-		JSONArray lists = resp.optJSONArray("lists");
+		JSONObject list = resp.optJSONObject("list");
+		JSONObject items = list.optJSONObject("listItems");
 		venues = new ArrayList<Venue>();
-		for(int i = 0; i < lists.length(); i++) {
-			JSONObject list = lists.optJSONObject(i);
-			JSONObject items = list.optJSONObject("listItems");
+		for(int i = 0; i < items.length(); i++) {			
 			JSONArray itm = items.optJSONArray("items");
 			for(int j = 0; j < itm.length(); j++) {
 				Venue v = new Venue(itm.optJSONObject(j));

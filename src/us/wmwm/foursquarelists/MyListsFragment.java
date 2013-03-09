@@ -32,8 +32,14 @@ public class MyListsFragment extends Fragment {
 			try {
 				FoursquareLists l = foursquareApi.getLists();
 				for(int i = 0; i < l.getIds().size(); i++) {
-					FoursquareList list = foursquareApi.getList(l.getIds().get(i));
+					final FoursquareList list = foursquareApi.getList(l.getIds().get(i));
 					System.out.println(list);
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							MyListsFragment.this.list.setAdapter(new VenueAdapter(list));
+						}
+					});
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -10,7 +10,8 @@ public class Venue {
 	
 	public Venue(JSONObject obj) {
 		id = obj.optString("id");
-		name = obj.optString("name");
+		JSONObject vn = obj.optJSONObject("venue");
+		name = vn.optString("name");
 	}
 	
 	public String getId() {
