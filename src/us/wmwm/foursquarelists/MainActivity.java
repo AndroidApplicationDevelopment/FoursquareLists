@@ -9,10 +9,11 @@ import android.view.Menu;
 
 public class MainActivity extends FragmentActivity {
 
-	FoursquareApi api = new FoursquareApi();
+	FoursquareApi api;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
@@ -40,7 +41,7 @@ public class MainActivity extends FragmentActivity {
 	private OnUserLoginListener onUserLoginListener = new OnUserLoginListener() {
 		@Override
 		public void onLogin(String token) {
-			finish();
+			api.save(token);
 		}
 	};
 

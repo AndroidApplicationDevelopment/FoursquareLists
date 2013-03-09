@@ -1,11 +1,16 @@
 package us.wmwm.foursquarelists;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
+
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -36,7 +41,18 @@ public class FoursquareApi {
 	public FoursquareList getLists() throws Exception {
 		URL u = new URL("https://api.foursquare.com/v2/users/self/lists");
 		HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-		conn.setRequestProperty("Authorization", newValue);
+		conn.setRequestProperty("Authorization", prefs.getString("token", null));
+		int code = conn.getResponseCode();
+		StringBuilder b = new StringBuilder();
+		InputStreamReader r = new InputStreamReader(conn.getInputStream());
+		BufferedReader br = new BufferedReader(r);
+		String line = null;
+		while((line = br.readLine())!=null) {
+			b.append(line).append("\n");
+		}
+		System.out.println(b);
+		JSONObject obj = new JSONObject(b.toString());
+		return new FoursquareList(obj);
 	}
 	
 	public String getRequestUrl() {
