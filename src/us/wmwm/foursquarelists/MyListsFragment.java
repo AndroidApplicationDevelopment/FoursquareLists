@@ -2,6 +2,9 @@ package us.wmwm.foursquarelists;
 
 import java.util.concurrent.Future;
 
+import us.wmwm.foursquarelists.services.FoursquareService;
+import us.wmwm.foursquarelists.services.FoursquareService.ListListener;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,40 +20,43 @@ public class MyListsFragment extends Fragment {
 	
 	FoursquareApi foursquareApi;
 	
+	FoursquareService service;
+	
 	VenueAdapter adapter;
 	
-	public void setFoursquareApi(FoursquareApi foursquareApi) {
-		this.foursquareApi = foursquareApi;
+	public void setService(FoursquareService service) {
+		this.service = service;
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		Threads.getExecutor().submit(loadLists);
+		service.updateLists(listListener);
 	}
 	
-	Runnable loadLists = new Runnable() {
-		public void run() {
-			try {
-				FoursquareLists l = foursquareApi.getLists();
-				for(int i = 0; i < l.getIds().size(); i++) {
-					final FoursquareList list = foursquareApi.getList(l.getIds().get(i));
-					System.out.println(list);
-					getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							if(adapter==null) {
-								MyListsFragment.this.list.setAdapter(adapter = new VenueAdapter(list));
-							} else {
-								adapter.append(list);
-							}
-						}
-					});
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+	ListListener listListener = new ListListener() {
+		
+		@Override
+		public void onFoursquareLists(FoursquareLists list) {
+			//
+			System.out.println("onFoursquareLists");
+		}
+		
+		@Override
+		public void onFoursquareList(final FoursquareList list) {
+			System.out.println("onFoursquareList");
+			Activity activity = getActivity();
+			if(activity==null) {
+				return;
 			}
-		};
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					adapter.append(list);
+				}
+			});
+			
+		}
 	};
 	
 	@Override

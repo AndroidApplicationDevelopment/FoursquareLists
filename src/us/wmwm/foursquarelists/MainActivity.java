@@ -26,13 +26,7 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		api = new FoursquareApi(this);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-		if(!api.isLoggedIn(this)) {
-			showLogin();
-		} else {
-			showLists();
-		}
+		setContentView(R.layout.activity_main);		
 		
 		Intent serviceIntent = new Intent(this, FoursquareService.class);
 		ServiceConnection conn = new ServiceConnection() {
@@ -45,8 +39,13 @@ public class MainActivity extends FragmentActivity {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder s) {
-				System.out.println(System.currentTimeMillis() - startService);
+				System.out.println("diff " + (System.currentTimeMillis() - startService));
 				service = ((LocalBinder<FoursquareService>)s).getService();
+				if(!api.isLoggedIn(MainActivity.this)) {
+					showLogin();
+				} else {
+					showLists();
+				}
 				
 			}
 		};
@@ -66,7 +65,7 @@ public class MainActivity extends FragmentActivity {
 	private void showLists() {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		MyListsFragment lf = new MyListsFragment();
-		lf.setFoursquareApi(api);
+		lf.setService(service);
 		ft.replace(R.id.fragment_content, lf,ft.getClass().getName());
 		ft.commit();
 	}
