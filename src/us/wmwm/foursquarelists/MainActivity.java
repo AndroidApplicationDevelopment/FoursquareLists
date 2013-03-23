@@ -2,7 +2,14 @@ package us.wmwm.foursquarelists;
 
 import us.wmwm.foursquarelists.fragments.LoginFragment;
 import us.wmwm.foursquarelists.fragments.LoginFragment.OnUserLoginListener;
+import us.wmwm.foursquarelists.services.FoursquareService;
+import us.wmwm.foursquarelists.services.LocalBinder;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
@@ -10,6 +17,10 @@ import android.view.Menu;
 public class MainActivity extends FragmentActivity {
 
 	FoursquareApi api;
+	
+	FoursquareService service;
+	
+	Long startService;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +33,25 @@ public class MainActivity extends FragmentActivity {
 		} else {
 			showLists();
 		}
+		
+		Intent serviceIntent = new Intent(this, FoursquareService.class);
+		ServiceConnection conn = new ServiceConnection() {
+			
+			@Override
+			public void onServiceDisconnected(ComponentName name) {
+				service = null;
+			}
+			
+			@SuppressWarnings("unchecked")
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder s) {
+				System.out.println(System.currentTimeMillis() - startService);
+				service = ((LocalBinder<FoursquareService>)s).getService();
+				
+			}
+		};
+		startService = System.currentTimeMillis();
+		bindService(serviceIntent, conn, Service.BIND_AUTO_CREATE);
 	}
 
 	private void showLogin() {
