@@ -1,25 +1,27 @@
 package us.wmwm.foursquarelists;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import us.wmwm.foursquarelists.services.VenueDAO;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class VenueAdapter extends BaseAdapter {
+public class VenueAdapter extends CursorAdapter {
 
-	FoursquareList list;
+	Map<String,Integer> fields = new HashMap<String,Integer>();
 	
-	public VenueAdapter(FoursquareList list) {
-		this.list = list;
-	}
+	VenueDAO dao;
 	
-	@Override
-	public int getCount() {
-		if(list!=null) {
-			return list.venues.size();
-		}
-		return 0;
+	public VenueAdapter(Context context, VenueDAO dao) {
+		super(context, null, false);
+		this.dao = dao;
 	}
 
 	@Override
@@ -34,20 +36,33 @@ public class VenueAdapter extends BaseAdapter {
 		return 0;
 	}
 
+	public void append(FoursquareList list2) {
+		swapCursor(dao.getVenues());
+		notifyDataSetChanged();
+	}
+	
 	@Override
-	public View getView(int pos, View convertView, ViewGroup arg2) {
-		// TODO Auto-generated method stub
-		if(convertView==null) {
-			convertView = LayoutInflater.from(arg2.getContext()).inflate(android.R.layout.simple_list_item_1, null);
-		} 
-		TextView txt = (TextView) convertView.findViewById(android.R.id.text1);
-		Venue v = list.venues.get(pos);
-		txt.setText(v.getName());
-		return convertView;
+	public Cursor swapCursor(Cursor newCursor) {
+		Cursor c = super.swapCursor(newCursor);
+		fields.clear();
+		for(int i = 0; i < newCursor.getColumnCount(); i++) {
+			String col = newCursor.getColumnName(i);
+			fields.put(col, i);
+		}
+		return newCursor;
+		
 	}
 
-	public void append(FoursquareList list2) {
-		list.venues.addAll(list2.getVenues());
+	@Override
+	public void bindView(View v, Context ctx, Cursor cursor) {
+		// TODO Auto-generated method stub
+		TextView txt = (TextView) v.findViewById(android.R.id.text1);
+		txt.setText(cursor.getString(fields.get("name")));
+	}
+
+	@Override
+	public View newView(Context ctx, Cursor cursor, ViewGroup arg2) {
+		return LayoutInflater.from(arg2.getContext()).inflate(android.R.layout.simple_list_item_1, null);		
 	}
 
 }

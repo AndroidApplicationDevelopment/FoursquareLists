@@ -4,6 +4,7 @@ import java.util.concurrent.Future;
 
 import us.wmwm.foursquarelists.services.FoursquareService;
 import us.wmwm.foursquarelists.services.FoursquareService.ListListener;
+import us.wmwm.foursquarelists.services.VenueDAO;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,8 @@ public class MyListsFragment extends Fragment {
 	
 	VenueAdapter adapter;
 	
+	Future<?> update;
+	
 	public void setService(FoursquareService service) {
 		this.service = service;
 	}
@@ -31,7 +34,22 @@ public class MyListsFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		service.updateLists(listListener);
+		adapter = new VenueAdapter(getActivity(), VenueDAO.getInstance());
+		list.setAdapter(adapter);
+		update();
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+	}
+	
+	
+	private void update() {
+		if(update!=null) {
+			update.cancel(true);			
+		}
+		update = service.updateLists(listListener);
 	}
 	
 	ListListener listListener = new ListListener() {
@@ -51,12 +69,18 @@ public class MyListsFragment extends Fragment {
 			}
 			activity.runOnUiThread(new Runnable() {
 				@Override
-				public void run() {
+				public void run() {					
 					adapter.append(list);
 				}
 			});
 			
 		}
+	};
+	
+	public void onDestroy() {
+		if(update!=null) {
+			update.cancel(true);
+		}		
 	};
 	
 	@Override
